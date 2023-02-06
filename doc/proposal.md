@@ -5,7 +5,7 @@ Data stored in the database will include information obtained from publicly avai
 The basic functions of the web application will include the ability for users to search for and view communications related to high frequency trading in a visual format using Google Earth. Users will be able to filter the results based on attributes such as frequency band and location. Additionally, the application will have a feature to allow users to manually add HFT-related communications not found in the FCC data.
 
 # Creative Component
-To improve the functionality of the application, a creative component could be the ability for users to visualize HFT communication activity over time. This could be achieved by plotting the communications data on a timeline and allowing users to select a date range to view. The resulting visualization would show the concentration of HFT-related communications in a given area over a specified time period. (This sounds difficult). Also building the filtering features into the front end nicely and integrating them with the google API would improve our application greatly, but might be challenging.
+To improve the functionality of the application, a creative component could be the ability for users to visualize HFT communication activity over time. This could be achieved by plotting the communications data on a timeline and allowing users to select a date range to view. The resulting visualization would show the concentration of HFT-related communications in a given area over a specified time period. Also building the filtering features into the front end nicely and integrating them with the google API would improve our application greatly, but might be challenging.
 
 # Title
 HFTracer: Visualizing High Frequency Trading Communications
@@ -28,7 +28,7 @@ The website offers a user-friendly interface for searching and visualizing HFT-r
 - **Filter**: Users can filter the search results based on frequency band and location, allowing them to easily identify the concentration of HFT activity in a specific area.
 - **Add Communications**: Users can manually add HFT-related communications not found in the FCC data. The added communications will be displayed on the Google Earth map and will be included in future searches.
 - **View Communications Over Time**: Users can view the HFT-related communications data over a specified time period by plotting the communications data on a timeline. This allows users to see the concentration of HFT activity in a given area over time.
-- **UI Mockup**: see mockup picture in docs folder
+- **UI Mockup**: see `UI Mockup.JPG` in docs folder
 
 # Distribution
 We will all work with the data and building a database out of it into something we can work with on the website. From there, Justin will build the "main" front end, as in drawing lines from the start to end locations and giving them their colors and integrating it with the google maps API. John will implement the frontend for the search as well as its functionality on the backend. Cheng-Han will implement a filter feature to sort the communications by their band or frequency, such that only the chosen "colors" will be displayed on the map. Amritesh will implement the adding communications feature to add new communications to the existing database and have them show up on the map. Then, because it's probably our loftiest goal, all of us will work together, time permitting, on implementing a feature to have the map be "animated" to show the timeline of communications.
