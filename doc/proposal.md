@@ -1,5 +1,9 @@
 # The Data
-Data stored in the database will include information obtained from publicly available FCC microwave and millimeter wave data. The data will include attributes such as frequency band, assigned call sign, location of transmission, and ownership information of the transmitting entity.
+Data stored in the database will include information obtained from publicly available FCC microwave and millimeter wave data. The data contains information such as frequency bands, call signs of the transmittors, start and end location of each transmission, and information about the owner of the transmitting entity. With this, we will be able to map out the transmissions on a map and store information about who is transmitting what, so we can better visualize what's happening in the high-frequency trading world.
+
+[Link to the data here:](https://www.fcc.gov/uls/transactions/daily-weekly) (https://www.fcc.gov/uls/transactions/daily-weekly)
+
+The aspects of the data we care about the most are the PA, EN, and LO files found in the `Microwave - 47 CFR Parts 74 and 101, and 3650 - 3700 MHz` list under `Licenses`. The PA and LO files found there contain location and path data, and will tell us the start and end locations of each transmission, as well as exact coordinates with which we can mark exact locations on a map. EN files contain entity information and can tell us who is sending and receiving the transmission, which we can use to learn more about their company, such as license type, entity type, name, registered email, and more. 
 
 # Functions
 The basic functions of the web application will include the ability for users to search for and view communications related to high frequency trading in a visual format using Google Earth. Users will be able to filter the results based on attributes such as frequency band and location. Additionally, the application will have a feature to allow users to manually add HFT-related communications not found in the FCC data.
