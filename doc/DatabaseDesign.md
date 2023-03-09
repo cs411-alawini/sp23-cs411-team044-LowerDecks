@@ -64,17 +64,4 @@ CREATE TABLE Locations(
 
 INSERT INTO Locations (unique_system_identifier,location_number,location_address,location_city,location_county,location_state,id) VALUES (954597,1,'VIC: NEW YORK NY','NEW YORK','NEW YORK','NY',1); -- ...
 
-DROP TABLE IF EXISTS `Antenna`;
-CREATE TABLE `Antenna` (
-	`antenna_number` INT NOT NULL,
-	`unique_system_identifier` VARCHAR(10) NOT NULL,
-	`beamwidth` numeric(4,1),
-	`gain` numeric(4,1),
-	`height_above_avg_terrain` numeric(5,1),
-	`height_to_tip` numeric(5,1),
-	`antenna_action_performed` CHAR(1),
-	PRIMARY KEY (`unique_systen_identifier`, `antenna_number`),
-    FOREIGN KEY (`unique_system_identifier`) REFERENCES `Path` (`unique_system_identifier`)
-);
-
 ```
