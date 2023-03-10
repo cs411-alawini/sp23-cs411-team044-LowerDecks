@@ -25,7 +25,6 @@ CREATE TABLE Path(
 	transmit_antenna_number INT,
 	receiver_antenna_number INT,
 	path_type_desc VARCHAR(50),
-	licensee_id VARCHAR(9),
 	PRIMARY KEY(unique_system_identifier, path_number)
     FOREIGN KEY (unique_system_identifier) REFERENCES License(unique_system_identifier)
 );
@@ -48,7 +47,7 @@ CREATE TABLE Coordinates(
 DROP TABLE IF EXISTS `Locations`;
 
 CREATE TABLE Locations(
-	unique_system_identifier VARCHAR(10) NOT NULL,
+	unique_system_identifier INT NOT NULL,
 	location_number INT NOT NULL,
 	location_address VARCHAR(100),
 	location_city VARCHAR(100),
