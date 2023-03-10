@@ -3,7 +3,7 @@
 ```sql
 USE `primaryset`;
 
-DROP TABLE IF EXISTS `Licensee`;
+DROP TABLE IF EXISTS `License`;
 
 CREATE TABLE License(
 	unique_system_identifier INT NOT NULL,
