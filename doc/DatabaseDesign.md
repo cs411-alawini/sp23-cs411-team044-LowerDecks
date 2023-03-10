@@ -6,7 +6,7 @@ USE `primaryset`;
 DROP TABLE IF EXISTS `Licensee`;
 
 CREATE TABLE License(
-	unique_system_identifier VARCHAR(10) NOT NULL,
+	unique_system_identifier INT NOT NULL,
 	name VARCHAR(200),
 	email VARCHAR(50),
 	street_address VARCHAR(60),
@@ -18,7 +18,7 @@ CREATE TABLE License(
 DROP TABLE IF EXISTS `Path`;
 
 CREATE TABLE Path(
-	unique_system_identifier VARCHAR(10) NOT NULL,
+	unique_system_identifier INT NOT NULL,
 	path_number INT NOT NULL,
 	transmit_location_number INT,
 	receiver_location_number INT,
