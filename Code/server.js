@@ -2,14 +2,14 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mysql = require('mysql2');
 var path = require('path');
-var connection = mysql.createConnection({
-                host: '34.134.82.72',
-                user: 'root',
-                password: 'LowerDecksFTW',
-                database: 'primaryset'
-});
+// var connection = mysql.createConnection({
+//                 host: '34.134.82.72',
+//                 user: 'root',
+//                 password: 'LowerDecksFTW',
+//                 database: 'primaryset'
+// });
 
-connection.connect;
+// connection.connect;
 
 
 var app = express();
@@ -24,31 +24,65 @@ app.use(express.static(__dirname + '../public'));
 
 /* GET home page, respond by rendering index.ejs */
 app.get('/', function(req, res) {
-  res.render('index', { title: 'Mark Attendance' });
+  res.render('index', {title: 'HFTracer'});
 });
 
 app.get('/success', function(req, res) {
       res.send({'message': 'Attendance marked successfully!'});
 });
  
-// this code is executed when a user clicks the form submit button
-app.post('/mark', function(req, res) {
-  var netid = req.body.netid;
+// TODO: Write this part of the code
+// PLEASE DON'T REMOVE ANY COMMENTED CODE
+// ******************************************************************************************
+app.post('/insert', function(req, res) {
+  var usi = req.body.usi;
+  var name = req.body.name;
    
-  var sql = `INSERT INTO attendance (netid, present) VALUES ('${netid}',1)`;
+  var sql = `INSERT INTO attendance (netid, present) VALUES ('${usi}',1)`;
 
-
-
-console.log(sql);
-  connection.query(sql, function(err, result) {
-    if (err) {
-      res.send(err)
-      return;
-    }
-    res.redirect('/success');
-  });
+  console.log(sql);
+  res.send({'message': 'Record Inserted Successfully'});
+  // connection.query(sql, function(err, result) {
+  //   if (err) {
+  //     res.send(err)
+  //     return;
+  //   }
+  //   res.redirect('/success');
+  // });
 });
 
+app.post('/search', function(req, res) {
+  var usi = req.body.usi;
+  
+  var sql = `INSERT INTO attendance (netid, present) VALUES ('${usi}',1)`;
+
+  console.log(sql);
+res.redirect('/success');
+
+});
+
+app.post('/update', function(req, res) {
+  var usi = req.body.usi;
+  
+  var sql = `INSERT INTO attendance (netid, present) VALUES ('${usi}',1)`;
+
+});
+
+app.post('/delete', function(req, res) {
+  var usi = req.body.usi;
+  
+  var sql = `INSERT INTO attendance (netid, present) VALUES ('${usi}',1)`;
+
+});
+
+app.post('/optimise', function(req, res) {
+  // Stage 4 Point 5 Optimisations, I have no idea what to do here @justin can suggest
+  var usi = req.body.usi;
+  
+  var sql = `INSERT INTO attendance (netid, present) VALUES ('${usi}',1)`;
+
+});
+  // ******************************************************************************************
 
 
 app.listen(80, function () {
