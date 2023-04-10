@@ -37,8 +37,12 @@ app.get('/success', function(req, res) {
 app.post('/insert', function(req, res) {
   var usi = req.body.usi;
   var name = req.body.name;
-   
-  var sql = `INSERT INTO attendance (netid, present) VALUES ('${usi}',1)`;
+  var email = req.body.email;
+  var street = req.body.street;
+  var city = req.body.city;
+  var state = req.body.state;
+  //INSERT INTO License (unique_system_identifier,name,email,street_address,city,state) VALUES ('954597','NBC TELEMUNDO LICENSE LLC','angela.ball@nbcuni.com','300 New Jersey Ave. SUITE 7','WASHINGTON','DC');
+  var sql = `INSERT INTO License (unique_system_identifier,name,email,street_address,city,state) VALUES (${usi},'${name}','${email}','${street}','${city}','${state}')`;
 
   console.log(sql);
   res.send({'message': 'Record Inserted Successfully'});
@@ -53,25 +57,41 @@ app.post('/insert', function(req, res) {
 
 app.post('/search', function(req, res) {
   var usi = req.body.usi;
+  var name = req.body.name;
   
-  var sql = `INSERT INTO attendance (netid, present) VALUES ('${usi}',1)`;
-
+  var sql = `SELECT li.unique_system_identifier, li.name, li.email, li.street_address, li.city, li.state
+  FROM License li
+  WHERE li.unique_system_identifier = ${usi} AND li.name = '${name}';`
   console.log(sql);
-res.redirect('/success');
+  res.redirect('/success');
 
 });
 
 app.post('/update', function(req, res) {
   var usi = req.body.usi;
-  
-  var sql = `INSERT INTO attendance (netid, present) VALUES ('${usi}',1)`;
+  var name = req.body.name;
+  var email = req.body.email;
+  var street = req.body.street;
+  var city = req.body.city;
+  var state = req.body.state;
+  //INSERT INTO Licensee (unique_system_identifier,name,email,street_address,city,state) VALUES ('954597','NBC TELEMUNDO LICENSE LLC','angela.ball@nbcuni.com','300 New Jersey Ave. SUITE 7','WASHINGTON','DC');
+  var sql = `UPDATE License
+  SET name = '${name}', email= '${email}', street_address= '${street}', city= '${city}', state= '${state}'
+  WHERE unique_system_identifier = ${usi};`;
+
+  console.log(sql);
+  res.send({'message': 'Record updated Successfully'});
 
 });
 
 app.post('/delete', function(req, res) {
   var usi = req.body.usi;
+  var name = req.body.name;
   
-  var sql = `INSERT INTO attendance (netid, present) VALUES ('${usi}',1)`;
+  var sql = `DELETE FROM License li
+  WHERE li.unique_system_identifier = ${usi} AND li.name = '${name}';`
+  console.log(sql);
+  res.send({'message': 'Record deleted Successfully'});
 
 });
 
