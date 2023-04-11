@@ -82,7 +82,7 @@ app.post('/update', function(req, res) {
   //INSERT INTO Licensee (unique_system_identifier,name,email,street_address,city,state) VALUES ('954597','NBC TELEMUNDO LICENSE LLC','angela.ball@nbcuni.com','300 New Jersey Ave. SUITE 7','WASHINGTON','DC');
   var sql = `UPDATE License
   SET email= '${email}', street_address= '${street}', city= '${city}', state= '${state}'
-  WHERE unique_system_identifier = ${usi} and name = '${name};`;
+  WHERE unique_system_identifier = ${usi} and name = '${name}';`;
 
   console.log(sql);
   connection.query(sql, function(err, result) {
