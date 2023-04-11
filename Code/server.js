@@ -73,20 +73,26 @@ app.post('/search', function(req, res) {
 });
 
 app.post('/update', function(req, res) {
-  var usi = req.body.usi;
-  var name = req.body.name;
-  var email = req.body.email;
-  var street = req.body.street;
-  var city = req.body.city;
-  var state = req.body.state;
+  var usi = req.body.updateusi;
+  var name = req.body.updatename;
+  var email = req.body.updateemail;
+  var street = req.body.updatestreet;
+  var city = req.body.updatecity;
+  var state = req.body.updatestate;
   //INSERT INTO Licensee (unique_system_identifier,name,email,street_address,city,state) VALUES ('954597','NBC TELEMUNDO LICENSE LLC','angela.ball@nbcuni.com','300 New Jersey Ave. SUITE 7','WASHINGTON','DC');
   var sql = `UPDATE License
-  SET name = '${name}', email= '${email}', street_address= '${street}', city= '${city}', state= '${state}'
-  WHERE unique_system_identifier = ${usi};`;
+  SET email= '${email}', street_address= '${street}', city= '${city}', state= '${state}'
+  WHERE unique_system_identifier = ${usi} and name = '${name};`;
 
   console.log(sql);
-  res.send({'message': 'Record updated Successfully'});
-
+  connection.query(sql, function(err, result) {
+    if (err) {
+      res.send(err)
+      return;
+    }
+    console.log(result);
+    res.send({'message': "Record updated Successfully",'result': result});
+  })
 });
 
 app.post('/delete', function(req, res) {
@@ -116,8 +122,14 @@ app.post('/advancedQuery1', function(req, res) {
   WHERE Locations.location_city = 'New York'
   LIMIT 15;`
   console.log(sql);
-  res.send({'message': 'advanced query 1'});
-
+  connection.query(sql, function(err, result) {
+    if (err) {
+      res.send(err)
+      return;
+    }
+    console.log(result);
+    res.send({'message': "Advanced Query 1",'result': result});
+  })
 });
 
 app.post('/advancedQuery2', function(req, res) {
@@ -129,7 +141,14 @@ app.post('/advancedQuery2', function(req, res) {
   ORDER BY Cnt DESC
   LIMIT 15;`
   console.log(sql);
-  res.send({'message': 'advanced query 2'});
+  connection.query(sql, function(err, result) {
+    if (err) {
+      res.send(err)
+      return;
+    }
+    console.log(result);
+    res.send({'message': "Advanced Query 2",'result': result});
+  })
 
 });
   // ******************************************************************************************
