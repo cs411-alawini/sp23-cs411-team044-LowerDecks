@@ -95,11 +95,31 @@ app.post('/delete', function(req, res) {
 
 });
 
-app.post('/optimise', function(req, res) {
-  // Stage 4 Point 5 Optimisations, I have no idea what to do here @justin can suggest
-  var usi = req.body.usi;
+app.post('/advancedQuery1', function(req, res) {
   
-  var sql = `INSERT INTO attendance (netid, present) VALUES ('${usi}',1)`;
+  var sql = `SELECT DISTINCT License.name
+  FROM License NATURAL JOIN Path JOIN Locations ON Locations.location_number = Path.transmit_location_number
+  WHERE Locations.location_city = 'Chicago'
+  UNION
+  SELECT DISTINCT License.name
+  FROM License NATURAL JOIN Path JOIN Locations ON Locations.location_number = Path.receiver_location_number
+  WHERE Locations.location_city = 'New York'
+  LIMIT 15;`
+  console.log(sql);
+  res.send({'message': 'advanced query 1'});
+
+});
+
+app.post('/advancedQuery2', function(req, res) {
+  
+  var sql = `SELECT loc.location_city, COUNT(*) as Cnt
+  FROM License li JOIN Locations loc USING (unique_system_identifier)
+  WHERE li.name LIKE '%INC.%'
+  GROUP BY loc.location_city
+  ORDER BY Cnt DESC
+  LIMIT 15;`
+  console.log(sql);
+  res.send({'message': 'advanced query 2'});
 
 });
   // ******************************************************************************************

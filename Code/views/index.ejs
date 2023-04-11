@@ -120,12 +120,21 @@
       
       <div class="card">
         <div class="card-body">
-          <h2>Stage 4 Point 5</h2>
-          <form action="/optimise" method="POST">
-            <div class="form-group">
-              <label for="netid">Net ID</label>
-              <input type="text" class="form-control col-lg-9" id="netid" aria-describedby="emailHelp" placeholder="Enter Net ID" name="netid">
-            </div>
+          <h2>advanced SQL query 1</h2>
+          <p>Name of the companies who own a license where a transmit location is in Chicago, or a receiver location is in New York.</p>
+          <form action="/advancedQuery1" method="POST">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+      
+      <br>
+      
+      <div class="card">
+        <div class="card-body">
+          <h2>advanced SQL query 2</h2>
+          <p>Number of communications locations that are present in each city. Only counts locations that are associated with a license where the company has an “INC.” in the name.</p>
+          <form action="/advancedQuery2" method="POST">
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>
         </div>
