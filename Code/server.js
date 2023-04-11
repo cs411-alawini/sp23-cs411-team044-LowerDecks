@@ -2,14 +2,14 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mysql = require('mysql2');
 var path = require('path');
-// var connection = mysql.createConnection({
-//                 host: '34.134.82.72',
-//                 user: 'root',
-//                 password: 'LowerDecksFTW',
-//                 database: 'primaryset'
-// });
+var connection = mysql.createConnection({
+                host: '34.134.82.72',
+                user: 'root',
+                password: 'LowerDecksFTW',
+                database: 'primaryset'
+});
 
-// connection.connect;
+connection.connect;
 
 
 var app = express();
@@ -35,36 +35,40 @@ app.get('/success', function(req, res) {
 // PLEASE DON'T REMOVE ANY COMMENTED CODE
 // ******************************************************************************************
 app.post('/insert', function(req, res) {
-  var usi = req.body.usi;
-  var name = req.body.name;
-  var email = req.body.email;
-  var street = req.body.street;
-  var city = req.body.city;
-  var state = req.body.state;
+  var usi = req.body.insertusi;
+  var name = req.body.insertname;
+  var email = req.body.insertemail;
+  var street = req.body.insertstreet;
+  var city = req.body.insertcity;
+  var state = req.body.insertstate;
   //INSERT INTO License (unique_system_identifier,name,email,street_address,city,state) VALUES ('954597','NBC TELEMUNDO LICENSE LLC','angela.ball@nbcuni.com','300 New Jersey Ave. SUITE 7','WASHINGTON','DC');
   var sql = `INSERT INTO License (unique_system_identifier,name,email,street_address,city,state) VALUES (${usi},'${name}','${email}','${street}','${city}','${state}')`;
 
   console.log(sql);
-  res.send({'message': 'Record Inserted Successfully'});
-  // connection.query(sql, function(err, result) {
-  //   if (err) {
-  //     res.send(err)
-  //     return;
-  //   }
-  //   res.redirect('/success');
-  // });
+  connection.query(sql, function(err, result) {
+    if (err) {
+      res.send(err)
+      return;
+    };
+    res.send({'message': "Inserted record into License with USI "+ usi+" : "+result});
+  });
 });
 
 app.post('/search', function(req, res) {
-  var usi = req.body.usi;
-  var name = req.body.name;
+  var usi = req.body.searchusi;
+  var name = req.body.searchname;
   
   var sql = `SELECT li.unique_system_identifier, li.name, li.email, li.street_address, li.city, li.state
   FROM License li
   WHERE li.unique_system_identifier = ${usi} AND li.name = '${name}';`
   console.log(sql);
-  res.redirect('/success');
-
+  connection.query(sql, function(err, result) {
+    if (err) {
+      res.send(err)
+      return;
+    }
+    res.send({'message': "Returned Records from License : "+ result});
+  })
 });
 
 app.post('/update', function(req, res) {
@@ -85,14 +89,19 @@ app.post('/update', function(req, res) {
 });
 
 app.post('/delete', function(req, res) {
-  var usi = req.body.usi;
-  var name = req.body.name;
+  var usi = req.body.deleteusi;
+  var name = req.body.deletename;
   
   var sql = `DELETE FROM License li
   WHERE li.unique_system_identifier = ${usi} AND li.name = '${name}';`
   console.log(sql);
-  res.send({'message': 'Record deleted Successfully'});
-
+  connection.query(sql, function(err, result) {
+    if (err) {
+      res.send(err)
+      return;
+    };
+    res.send({'message': "Deleted Record from License with usi "+usi+" and name "+name+" : "+result});
+  })
 });
 
 app.post('/advancedQuery1', function(req, res) {
