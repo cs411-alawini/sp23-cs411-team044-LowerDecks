@@ -67,6 +67,7 @@ app.post('/search', function(req, res) {
       res.send(err)
       return;
     }
+    console.log(result);
     res.send({'message': "Returned Records from License : "+ result});
   })
 });
