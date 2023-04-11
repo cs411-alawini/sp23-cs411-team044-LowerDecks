@@ -27,13 +27,6 @@ app.get('/', function(req, res) {
   res.render('index', {title: 'HFTracer'});
 });
 
-app.get('/success', function(req, res) {
-      res.send({'message': 'Attendance marked successfully!'});
-});
- 
-// TODO: Write this part of the code
-// PLEASE DON'T REMOVE ANY COMMENTED CODE
-// ******************************************************************************************
 app.post('/insert', function(req, res) {
   var usi = req.body.insertusi;
   var name = req.body.insertname;
@@ -50,7 +43,7 @@ app.post('/insert', function(req, res) {
       res.send(err)
       return;
     };
-    res.send({'message': "Inserted record into License with USI "+ usi+" and name"+name,'result':result });
+    res.send({'message': "Inserted record into License with USI "+ usi+" and name"+name,'result':result});
   });
 });
 
@@ -151,8 +144,6 @@ app.post('/advancedQuery2', function(req, res) {
   })
 
 });
-  // ******************************************************************************************
-
 
 app.listen(80, function () {
     console.log('Node app is running on port 80');
