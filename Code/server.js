@@ -50,7 +50,7 @@ app.post('/insert', function(req, res) {
       res.send(err)
       return;
     };
-    res.send({'message': "Inserted record into License with USI "+ usi+" : "+result});
+    res.send({'message': "Inserted record into License with USI "+ usi+" and name"+name,'result':result });
   });
 });
 
@@ -68,7 +68,7 @@ app.post('/search', function(req, res) {
       return;
     }
     console.log(result);
-    res.send({'message': result});
+    res.send({'message': "Returned Records from License",'result': result});
   })
 });
 
@@ -101,7 +101,7 @@ app.post('/delete', function(req, res) {
       res.send(err)
       return;
     };
-    res.send({'message': "Deleted Record from License with usi "+usi+" and name "+name+" : "+result});
+    res.send({'message': "Deleted Record from License with usi "+usi+" and name "+name, 'result':result});
   })
 });
 
