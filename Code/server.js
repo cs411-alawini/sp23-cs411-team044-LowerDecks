@@ -105,14 +105,15 @@ app.post('/delete', function(req, res) {
 });
 
 app.post('/advancedQuery1', function(req, res) {
-  
+  var aqlocation1 = req.body.aqlocation1;
+  var aqlocation2 = req.body.aqlocation2;
   var sql = `SELECT DISTINCT License.name
   FROM License NATURAL JOIN Path JOIN Locations ON Locations.location_number = Path.transmit_location_number
-  WHERE Locations.location_city = 'Chicago'
+  WHERE Locations.location_city = '${aqlocation1}'
   UNION
   SELECT DISTINCT License.name
   FROM License NATURAL JOIN Path JOIN Locations ON Locations.location_number = Path.receiver_location_number
-  WHERE Locations.location_city = 'New York'
+  WHERE Locations.location_city = '${aqlocation2}'
   LIMIT 15;`
   console.log(sql);
   connection.query(sql, function(err, result) {
