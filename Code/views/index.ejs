@@ -9,7 +9,7 @@
 
   <body>
     <center><h1>Welcome to HFTracer</h1></center>
-    <div class="container mt-4">
+    <div class="container mt-4" name="initial">
       <div class="card">
         <div class="card-body">
           <h2>Insert into License</h2>
@@ -147,6 +147,19 @@
           </form>
         </div>
       </div>
+      
+      <br>
+      
+      <div class="card">
+        <div class="card-body">
+          <h2>Transaction</h2>
+          <p>Make a transaction</p>
+          <form action="/transaction" method="POST">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
     </div>
+
   </body>
 </html>

@@ -146,6 +146,54 @@ app.post('/advancedQuery2', function(req, res) {
 
 });
 
+app.post('/transaction', function(req, res) {
+    
+    var sql = `SELECT
+    L.unique_system_identifier,
+    C1.lat_degrees AS trans_lat_degrees,
+    C1.lat_minutes AS trans_lat_minutes,
+    C1.lat_seconds AS trans_lat_seconds,
+    C1.long_degrees AS trans_long_degrees,
+    C1.long_minutes AS trans_long_minutes,
+    C1.long_seconds AS trans_long_seconds,
+    C2.lat_degrees AS rec_lat_degrees,
+    C2.lat_minutes AS rec_lat_minutes,
+    C2.lat_seconds AS rec_lat_seconds,
+    C2.long_degrees AS rec_long_degrees,
+    C2.long_minutes AS rec_long_minutes,
+    C2.long_seconds AS rec_long_seconds
+FROM
+    License L
+JOIN
+    Path P
+    ON L.unique_system_identifier = P.unique_system_identifier
+JOIN
+    Locations L1
+    ON P.transmit_location_number = L1.location_number AND L1.unique_system_identifier = P.unique_system_identifier
+JOIN
+    Locations L2
+    ON P.receiver_location_number = L2.location_number AND L2.unique_system_identifier = P.unique_system_identifier
+JOIN
+    Coordinates C1
+    ON L1.id = C1.id
+JOIN
+    Coordinates C2
+    ON L2.id = C2.id
+WHERE
+    P.path_type_desc = 'Fixed Point-to-Point';`
+    console.log(sql);
+    connection.query(sql, function(err, result) {
+      if (err) {
+        res.send(err)
+        return;
+      }
+      console.log(result);
+      res.send('<html><head><title>New Page</title></head><body><h1>New Page</h1><iframe src="https://www.google.com/maps/d/u/3/embed?mid=1jy4kINNsLBSc-wnzUyWzcB-8sAhMeA4&ehbc=2E312F" width="640" height="480"></iframe></body></html>');
+      // res.send({'message': "transaction",'result': result});
+    })
+  
+  });
+
 app.listen(80, function () {
     console.log('Node app is running on port 80');
 });
