@@ -11,6 +11,62 @@ var connection = mysql.createConnection({
 
 connection.connect;
 
+function convertToCSV(objArray) {
+  var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+  var str = '';
+  for (var i = 0; i < array.length; i++) {
+      var line = '';
+      for (var index in array[i]) {
+          if (line != '') line += ','
+
+          line += array[i][index];
+      }
+
+      str += line + '\r\n';
+  }
+
+  return str;
+}
+function exportCSVFile(headers, items, fileTitle) {
+  if (headers) {
+      items.unshift(headers);
+  }
+  // Convert Object to JSON
+  var jsonObject = JSON.stringify(items);
+  var csv = this.convertToCSV(jsonObject);
+  var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  if (navigator.msSaveBlob) { // IE 10+
+      navigator.msSaveBlob(blob, exportedFilenmae);
+  } else {
+      var link = document.createElement("a");
+      if (link.download !== undefined) { // feature detection
+          // Browsers that support HTML5 download attribute
+          var url = URL.createObjectURL(blob);
+          link.setAttribute("href", url);
+          link.setAttribute("download", exportedFilenmae);
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+      }
+  }
+}
+var headers = {
+  usi: 'unique_system_identifier',
+  tlad: 'trans_lat_degrees',
+  tlam: 'trans_lat_minutes',
+  tlas: 'trans_lat_seconds',
+  tlod: 'trans_long_degrees',
+  tlom: 'trans_long_minutes',
+  tlos: 'trans_long_seconds',
+  rlad: 'rec_lat_degrees',
+  rlam: 'rec_lat_minutes',
+  rlas: 'rec_lat_seconds',
+  rlod: 'rec_long_degrees',
+  rlom: 'rec_long_minutes',
+  rlos: 'rec_long_seconds'
+};
 
 var app = express();
 
@@ -146,7 +202,7 @@ app.post('/advancedQuery2', function(req, res) {
 
 });
 
-app.post('/transaction', function(req, res) {
+app.post('/ECFeature', function(req, res) {
     
     var sql = `SELECT
     L.unique_system_identifier,
@@ -189,7 +245,29 @@ WHERE
         return;
       }
       console.log(result);
-      res.send('<html><head><title>New Page</title></head><body><h1>New Page</h1><iframe src="https://www.google.com/maps/d/u/3/embed?mid=1jy4kINNsLBSc-wnzUyWzcB-8sAhMeA4&ehbc=2E312F" width="640" height="480"></iframe></body></html>');
+      
+      var itemsformatted=[]
+      result.forEach((item) =>{
+        itemsformatted.push({
+          usi: item.unique_system_identifier,
+          tlad: item.trans_lat_degrees,
+          tlam: item.trans_lat_minutes,
+          tlas: item.trans_lat_seconds,
+          tlod: item.trans_long_degrees,
+          tlom: item.trans_long_minutes,
+          tlos: item.trans_long_seconds,
+          rlad: item.rec_lat_degrees,
+          rlam: item.rec_lat_minutes,
+          rlas: item.rec_lat_seconds,
+          rlod: item.rec_long_degrees,
+          rlom: item.rec_long_minutes,
+          rlos: item.rec_long_seconds
+        });
+      });
+      var fileTitle='exported_results';
+      exportCSVFile(headers, itemsformatted, fileTitle);
+
+      // res.send('<html><head><title>New Page</title></head><body><h1>New Page</h1><iframe src="https://www.google.com/maps/d/u/3/embed?mid=1jy4kINNsLBSc-wnzUyWzcB-8sAhMeA4&ehbc=2E312F" width="640" height="480"></iframe></body></html>');
       // res.send({'message': "transaction",'result': result});
     })
   
@@ -198,6 +276,7 @@ WHERE
 app.listen(80, function () {
     console.log('Node app is running on port 80');
 });
+
 
 // import csv
 // import simplekml
