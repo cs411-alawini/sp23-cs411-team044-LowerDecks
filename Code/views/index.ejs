@@ -11,7 +11,6 @@
     width: 100%;
   }
 </style>
-
   </head>
   <body>
     <script>
@@ -19,8 +18,8 @@
     
       function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 4,
-          center: { lat: 37.7749, lng: -122.4194 },
+          zoom: 5,
+          center: { lat: 41.8781, lng: -87.6298  },
         });
     
         fetch('/show-paths')
@@ -41,7 +40,7 @@
                 geodesic: true,
                 strokeColor: '#FF0000',
                 strokeOpacity: 1.0,
-                strokeWeight: 5,
+                strokeWeight: 2,
               });
               polyline.setMap(map);
             });
@@ -50,8 +49,15 @@
     
       document.addEventListener('DOMContentLoaded', initMap);
     </script>
-    
     <center><h1>Welcome to HFTracer</h1></center>
+    <div class="container mt-4">
+      <div class="card">
+        <div class="card-body">
+          <h2>Path Visualization</h2>
+          <div id="map" style="height: 400px;"></div>
+        </div>
+      </div>
+      <br>
     <div class="container mt-4" name="initial">
       <div class="card">
         <div class="card-body">
@@ -202,17 +208,6 @@
           </form>
         </div>
       </div>
-      
-      <br>
-
-      <div class="card">
-        <div class="card-body">
-          <h2>Path Visualization</h2>
-          <div id="map" style="height: 400px;"></div>
-        </div>
-      </div>
-
-
     </div>
 
   </body>

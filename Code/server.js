@@ -33,53 +33,75 @@ function dmsToDD(degrees, minutes, seconds) {
 }
 
 app.get('/show-paths', function (req, res) {
-  // Assuming you have the result from the query in a variable called `result`
-  const result = [
-    // Sample data in the format of the result from the query
-    {
-      unique_system_identifier: "1",
-      trans_lat_degrees: "29",
-      trans_lat_minutes: "35",
-      trans_lat_seconds: "22.5",
-      trans_long_degrees: "98",
-      trans_long_minutes: "28",
-      trans_long_seconds: "17.5",
-      rec_lat_degrees: "29",
-      rec_lat_minutes: "31",
-      rec_lat_seconds: "49.2",
-      rec_long_degrees: "98",
-      rec_long_minutes: "31",
-      rec_long_seconds: "6.3",
-    },
-  ];
+  const sql = `SELECT
+    L.unique_system_identifier,
+    C1.lat_degrees AS trans_lat_degrees,
+    C1.lat_minutes AS trans_lat_minutes,
+    C1.lat_seconds AS trans_lat_seconds,
+    C1.long_degrees AS trans_long_degrees,
+    C1.long_minutes AS trans_long_minutes,
+    C1.long_seconds AS trans_long_seconds,
+    C2.lat_degrees AS rec_lat_degrees,
+    C2.lat_minutes AS rec_lat_minutes,
+    C2.lat_seconds AS rec_lat_seconds,
+    C2.long_degrees AS rec_long_degrees,
+    C2.long_minutes AS rec_long_minutes,
+    C2.long_seconds AS rec_long_seconds
+FROM
+    License L
+JOIN
+    Path P
+    ON L.unique_system_identifier = P.unique_system_identifier
+JOIN
+    Locations L1
+    ON P.transmit_location_number = L1.location_number AND L1.unique_system_identifier = P.unique_system_identifier
+JOIN
+    Locations L2
+    ON P.receiver_location_number = L2.location_number AND L2.unique_system_identifier = P.unique_system_identifier
+JOIN
+    Coordinate C1
+    ON L1.id = C1.id
+JOIN
+    Coordinate C2
+    ON L2.id = C2.id
+WHERE
+    P.path_type_desc = 'Fixed Point-to-Point'
+    AND L.email REGEXP '^([A-Za-z0-9._%+-]+@(zmckay-brothers\\.com|wcwtech\\.com|geodesicnetworks\\.com|auburndata\\.com|abservicesllc\\.com|NeXXComwireless\\.com|isignalnetworks\\.com|anova-tech\\.com|infiniumcm\\.com|tatora\\.com|midwestics\\.com|apsaranetworks\\.com|bsonetwork\\.com|striketechnologies\\.com|akingump\\.com|surveillancetechs\\.com|bobbroadband\\.com|gammafcc@gmail\\.com|newlinenet\\.com))$';`
+  connection.query(sql, function (err, result) {
+    if (err) {
+      res.send(err);
+      return;
+    }
 
-  let kmlString = '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document>';
+    let kmlString = '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document>';
 
-  result.forEach((row) => {
-    const transDecLat = dmsToDD(row.trans_lat_degrees, row.trans_lat_minutes, row.trans_lat_seconds);
-    const transDecLong = -dmsToDD(row.trans_long_degrees, row.trans_long_minutes, row.trans_long_seconds);
-    const recDecLat = dmsToDD(row.rec_lat_degrees, row.rec_lat_minutes, row.rec_lat_seconds);
-    const recDecLong = -dmsToDD(row.rec_long_degrees, row.rec_long_minutes, row.rec_long_seconds);
+    result.forEach((row) => {
+      const transDecLat = dmsToDD(row.trans_lat_degrees, row.trans_lat_minutes, row.trans_lat_seconds);
+      const transDecLong = -dmsToDD(row.trans_long_degrees, row.trans_long_minutes, row.trans_long_seconds);
+      const recDecLat = dmsToDD(row.rec_lat_degrees, row.rec_lat_minutes, row.rec_lat_seconds);
+      const recDecLong = -dmsToDD(row.rec_long_degrees, row.rec_long_minutes, row.rec_long_seconds);
 
-    kmlString += `<Placemark>
-      <name>${row.unique_system_identifier}</name>
-      <styleUrl>#line-1</styleUrl>
-      <LineString>
-        <coordinates>${transDecLong},${transDecLat} ${recDecLong},${recDecLat}</coordinates>
-      </LineString>
-    </Placemark>`;
+      kmlString += `<Placemark>
+        <name>${row.unique_system_identifier}</name>
+        <styleUrl>#line-1</styleUrl>
+        <LineString>
+          <coordinates>${transDecLong},${transDecLat} ${recDecLong},${recDecLat}</coordinates>
+        </LineString>
+      </Placemark>`;
+    });
+
+    kmlString += '</Document></kml>';
+
+    // Convert KML to GeoJSON
+    const parser = new DOMParser();
+    const kml = parser.parseFromString(kmlString, 'text/xml');
+    const geojson = toGeoJSON.kml(kml);
+
+    // Send the GeoJSON object to the frontend
+    res.send({ geojson });
   });
-
-  kmlString += '</Document></kml>';
-
-  // Convert KML to GeoJSON
-  const parser = new DOMParser();
-  const kml = parser.parseFromString(kmlString, 'text/xml');
-  const geojson = toGeoJSON.kml(kml);
-
-  // Send the GeoJSON object to the frontend
-  res.send({ geojson });
 });
+
 
 /* GET home page, respond by rendering index.ejs */
 app.get('/', function(req, res) {
