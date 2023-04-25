@@ -5,9 +5,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-  </head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7EGvkfFKSINpd79_lv8EHrq7W9KtxPB0"></script>
+<style>
+  #map {
+    width: 100%;
+  }
+</style>
 
+  </head>
   <body>
+    <script>
+      let map;
+    
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 4,
+          center: { lat: 37.7749, lng: -122.4194 },
+        });
+    
+        fetch('/show-paths')
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            const geojson = data.geojson;
+            geojson.features.forEach((feature) => {
+     
+              const coordinates = feature.geometry.coordinates;
+              const path = [
+                { lat: coordinates[0][1], lng: coordinates[0][0] },
+                { lat: coordinates[1][1], lng: coordinates[1][0] }
+              ];
+
+              const polyline = new google.maps.Polyline({
+                path: path,
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 5,
+              });
+              polyline.setMap(map);
+            });
+          });
+      }
+    
+      document.addEventListener('DOMContentLoaded', initMap);
+    </script>
+    
     <center><h1>Welcome to HFTracer</h1></center>
     <div class="container mt-4" name="initial">
       <div class="card">
@@ -159,6 +202,17 @@
           </form>
         </div>
       </div>
+      
+      <br>
+
+      <div class="card">
+        <div class="card-body">
+          <h2>Path Visualization</h2>
+          <div id="map" style="height: 400px;"></div>
+        </div>
+      </div>
+
+
     </div>
 
   </body>

@@ -14,6 +14,7 @@ connection.connect;
 
 var app = express();
 
+
 // set up ejs view engine 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -21,6 +22,64 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname + '../public'));
+
+
+const fs = require('fs');
+const { DOMParser } = require('xmldom');
+const toGeoJSON = require('togeojson');
+
+function dmsToDD(degrees, minutes, seconds) {
+  return parseFloat(degrees) + parseFloat(minutes) / 60 + parseFloat(seconds) / 3600;
+}
+
+app.get('/show-paths', function (req, res) {
+  // Assuming you have the result from the query in a variable called `result`
+  const result = [
+    // Sample data in the format of the result from the query
+    {
+      unique_system_identifier: "1",
+      trans_lat_degrees: "29",
+      trans_lat_minutes: "35",
+      trans_lat_seconds: "22.5",
+      trans_long_degrees: "98",
+      trans_long_minutes: "28",
+      trans_long_seconds: "17.5",
+      rec_lat_degrees: "29",
+      rec_lat_minutes: "31",
+      rec_lat_seconds: "49.2",
+      rec_long_degrees: "98",
+      rec_long_minutes: "31",
+      rec_long_seconds: "6.3",
+    },
+  ];
+
+  let kmlString = '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document>';
+
+  result.forEach((row) => {
+    const transDecLat = dmsToDD(row.trans_lat_degrees, row.trans_lat_minutes, row.trans_lat_seconds);
+    const transDecLong = -dmsToDD(row.trans_long_degrees, row.trans_long_minutes, row.trans_long_seconds);
+    const recDecLat = dmsToDD(row.rec_lat_degrees, row.rec_lat_minutes, row.rec_lat_seconds);
+    const recDecLong = -dmsToDD(row.rec_long_degrees, row.rec_long_minutes, row.rec_long_seconds);
+
+    kmlString += `<Placemark>
+      <name>${row.unique_system_identifier}</name>
+      <styleUrl>#line-1</styleUrl>
+      <LineString>
+        <coordinates>${transDecLong},${transDecLat} ${recDecLong},${recDecLat}</coordinates>
+      </LineString>
+    </Placemark>`;
+  });
+
+  kmlString += '</Document></kml>';
+
+  // Convert KML to GeoJSON
+  const parser = new DOMParser();
+  const kml = parser.parseFromString(kmlString, 'text/xml');
+  const geojson = toGeoJSON.kml(kml);
+
+  // Send the GeoJSON object to the frontend
+  res.send({ geojson });
+});
 
 /* GET home page, respond by rendering index.ejs */
 app.get('/', function(req, res) {
