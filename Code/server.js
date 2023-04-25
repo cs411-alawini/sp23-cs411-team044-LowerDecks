@@ -33,6 +33,8 @@ function dmsToDD(degrees, minutes, seconds) {
 }
 
 app.get('/show-paths', function (req, res) {
+  let emailAddresses = req.query.emails.split(','); // extract email addresses from query parameter
+  let emailRegex = '^(' + emailAddresses.join('|') + ')$'; // create regex pattern from email addresses
   const sql = `SELECT
     L.unique_system_identifier,
     C1.lat_degrees AS trans_lat_degrees,
@@ -66,8 +68,8 @@ JOIN
     ON L2.id = C2.id
 WHERE
     P.path_type_desc = 'Fixed Point-to-Point'
-    AND L.email REGEXP '^([A-Za-z0-9._%+-]+@(zmckay-brothers\\.com|wcwtech\\.com|geodesicnetworks\\.com|auburndata\\.com|abservicesllc\\.com|NeXXComwireless\\.com|isignalnetworks\\.com|anova-tech\\.com|infiniumcm\\.com|tatora\\.com|midwestics\\.com|apsaranetworks\\.com|bsonetwork\\.com|striketechnologies\\.com|akingump\\.com|surveillancetechs\\.com|bobbroadband\\.com|gammafcc@gmail\\.com|newlinenet\\.com))$';`
-  connection.query(sql, function (err, result) {
+    AND L.email REGEXP ?`; // use parameterized query
+  connection.query(sql, [emailRegex], function (err, result){
     if (err) {
       res.send(err);
       return;
