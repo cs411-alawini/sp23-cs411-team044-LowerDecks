@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= title %></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  </head>
+
+  <body>
+    <center><h1>Welcome to HFTracer</h1></center>
+    <div class="container mt-4" name="initial">
+      <div class="card">
+        <div class="card-body">
+          <h2>Insert into License</h2>
+          <form action="insert" method="POST">
+            <div class="form-group">
+              <label for="usi">Unique_System_Identifier</label>
+              <input type="text" class="form-control col-lg-9" id="insertusi" aria-describedby="emailHelp" placeholder="Enter Unique_System_Identifier" name="insertusi">
+            </div>
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" class="form-control col-lg-9" id="insertname" aria-describedby="emailHelp" placeholder="Enter Name" name="insertname">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="text" class="form-control col-lg-9" id="insertemail" aria-describedby="emailHelp" placeholder="Enter Email" name="insertemail">
+            </div>
+            <div class="form-group">
+              <label for="street">Street_Address</label>
+              <input type="text" class="form-control col-lg-9" id="insertstreet" aria-describedby="emailHelp" placeholder="Enter Street_Address" name="insertstreet">
+            </div>
+            <div class="form-group">
+              <label for="city">City</label>
+              <input type="text" class="form-control col-lg-9" id="insertcity" aria-describedby="emailHelp" placeholder="Enter City" name="insertcity">
+            </div>
+            <div class="form-group">
+              <label for="state">State</label>
+              <input type="text" class="form-control col-lg-9" id="insertstate" aria-describedby="emailHelp" placeholder="Enter State" name="insertstate">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="card">
+        <div class="card-body">
+          <h2>Search for License</h2>
+          <form action="search" method="POST">
+            <div class="form-group">
+              <label for="usi">Unique_System_Identifier</label>
+              <input type="text" class="form-control col-lg-9" id="searchusi" aria-describedby="emailHelp" placeholder="Enter Unique_System_Identifier" name="searchusi">
+            </div>
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" class="form-control col-lg-9" id="searchname" aria-describedby="emailHelp" placeholder="Enter Name" name="searchname">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="card">
+        <div class="card-body">
+          <h2>Update Records in License</h2>
+          <form action="update" method="POST">
+            <div class="form-group">
+              <label for="usi">Unique_System_Identifier</label>
+              <input type="text" class="form-control col-lg-9" id="updateusi" aria-describedby="emailHelp" placeholder="Enter Unique_System_Identifier" name="updateusi">
+            </div>
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" class="form-control col-lg-9" id="updatename" aria-describedby="emailHelp" placeholder="Enter Name" name="updatename">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="text" class="form-control col-lg-9" id="updateemail" aria-describedby="emailHelp" placeholder="If no change please insert existing" name="updateemail">
+            </div>
+            <div class="form-group">
+              <label for="street">Street_Address</label>
+              <input type="text" class="form-control col-lg-9" id="updatestreet" aria-describedby="emailHelp" placeholder="If no change please insert existing" name="updatestreet">
+            </div>
+            <div class="form-group">
+              <label for="city">City</label>
+              <input type="text" class="form-control col-lg-9" id="updatecity" aria-describedby="emailHelp" placeholder="If no change please insert existing" name="updatecity">
+            </div>
+            <div class="form-group">
+              <label for="state">State</label>
+              <input type="text" class="form-control col-lg-9" id="updatestate" aria-describedby="emailHelp" placeholder="If no change please insert existing" name="updatestate">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+
+      <br>
+      
+      <div class="card">
+        <div class="card-body">
+          <h2>Delete entry in Path</h2>
+          <form action="delete" method="POST">
+            <div class="form-group">
+              <label for="usi">Unique_System_Identifier</label>
+              <input type="text" class="form-control col-lg-9" id="deleteusi" aria-describedby="emailHelp" placeholder="Enter Unique_System_Identifier" name="deleteusi">
+            </div>
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" class="form-control col-lg-9" id="deletename" aria-describedby="emailHelp" placeholder="Enter Name" name="deletename">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+      
+      <br>
+      
+      <div class="card">
+        <div class="card-body">
+          <h2>Advanced SQL query 1</h2>
+          <p>Name of the companies who own a license where a transmit location is in Chicago, or a receiver location is in New York.</p>
+          <form action="/advancedQuery1" method="POST">
+            <div class="form-group">
+              <label for="tl">Transmitter Location</label>
+              <input type="text" class="form-control col-lg-9" id="aqlocation1" aria-describedby="emailHelp" placeholder="Enter Transmitter Location" name="aqlocation1">
+            </div>
+            <div class="form-group">
+              <label for="rl">Receiver Location</label>
+              <input type="text" class="form-control col-lg-9" id="aqlocation2" aria-describedby="emailHelp" placeholder="Enter Receiver Location" name="aqlocation2">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+      
+      <br>
+      
+      <div class="card">
+        <div class="card-body">
+          <h2>Advanced SQL query 2</h2>
+          <p>Number of communications locations that are present in each city. Only counts locations that are associated with a license where the company has an “INC.” in the name.</p>
+          <form action="/advancedQuery2" method="POST">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+      
+      <br>
+      
+      <div class="card">
+        <div class="card-body">
+          <h2>Transaction</h2>
+          <p>Make a transaction</p>
+          <form action="/ECFeature" method="POST">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
