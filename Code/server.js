@@ -180,7 +180,8 @@ JOIN
     Coordinate C2
     ON L2.id = C2.id
 WHERE
-    P.path_type_desc = 'Fixed Point-to-Point';`
+    P.path_type_desc = 'Fixed Point-to-Point'
+    and L.email = 'djones@hbi.com';`
     console.log(sql);
     connection.query(sql, function(err, result) {
       if (err) {
@@ -197,3 +198,41 @@ WHERE
 app.listen(80, function () {
     console.log('Node app is running on port 80');
 });
+
+// import csv
+// import simplekml
+
+// def dms_to_dd(d, m, s):
+//     try:
+//         return float(d) + float(m) / 60 + float(s) / 3600
+//     except (ValueError, TypeError):
+//         return None
+
+// def dms_to_dd1(d, m, s):
+//     try:
+//         return (float(d) + float(m) / 60 + float(s) / 3600)*-1
+//     except (ValueError, TypeError):
+//         return None
+
+// def create_kml(input_file, output_file):
+//     kml = simplekml.Kml()
+
+//     with open(input_file, "r") as f:
+//         reader = csv.DictReader(f)
+//         for row in reader:
+//             trans_dec_lat = dms_to_dd(row["trans_lat_degrees"], row["trans_lat_minutes"], row["trans_lat_seconds"])
+//             trans_dec_long = dms_to_dd1(row["trans_long_degrees"], row["trans_long_minutes"], row["trans_long_seconds"])
+//             rec_dec_lat = dms_to_dd(row["rec_lat_degrees"], row["rec_lat_minutes"], row["rec_lat_seconds"])
+//             rec_dec_long = dms_to_dd1(row["rec_long_degrees"], row["rec_long_minutes"], row["rec_long_seconds"])
+
+//             if trans_dec_lat and trans_dec_long and rec_dec_lat and rec_dec_long:
+//                 coords = [(trans_dec_long, trans_dec_lat), (rec_dec_long, rec_dec_lat)]
+//                 lin = kml.newlinestring(name=row["unique_system_identifier"], coords=coords)
+//                 lin.style.linestyle.color = "ff0000ff"  # Red
+
+//     kml.save(output_file)
+
+// if __name__ == "__main__":
+//     input_file = "exported_results.csv"
+//     output_file = "output.kml"
+//     create_kml(input_file, output_file)
