@@ -27,6 +27,7 @@
   <body>
     <script>
       let map;
+      let polylines = [];
     
       function initMap() {
         useOriginalRegex();
@@ -38,7 +39,6 @@
         fetch(`/show-paths?emails=${emails}`)
           .then((response) => response.json())
           .then((data) => {
-            console.log(data);
             const geojson = data.geojson;
             geojson.features.forEach((feature) => {
      
@@ -56,10 +56,15 @@
                 strokeWeight: 2,
               });
               polyline.setMap(map);
+              polylines.push(polyline);
             });
           });
       }
       function updatePaths() {
+        polylines.forEach((polyline) => {
+          polyline.setMap(null);
+        });
+        polylines = [];
         const emails = document.getElementById("emails").value;
         console.log(emails)
         fetch(`/show-paths?emails=${emails}`)
@@ -83,6 +88,7 @@
               strokeWeight: 2,
             });
             polyline.setMap(map);
+            polylines.push(polyline);
           });
         });
       }
