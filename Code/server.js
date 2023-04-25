@@ -174,10 +174,10 @@ JOIN
     Locations L2
     ON P.receiver_location_number = L2.location_number AND L2.unique_system_identifier = P.unique_system_identifier
 JOIN
-    Coordinates C1
+    Coordinate C1
     ON L1.id = C1.id
 JOIN
-    Coordinates C2
+    Coordinate C2
     ON L2.id = C2.id
 WHERE
     P.path_type_desc = 'Fixed Point-to-Point';`
