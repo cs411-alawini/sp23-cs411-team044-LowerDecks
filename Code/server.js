@@ -24,7 +24,6 @@ function convertToCSV(objArray) {
 
       str += line + '\r\n';
   }
-
   return str;
 }
 function exportCSVFile(headers, items, fileTitle) {
@@ -33,7 +32,7 @@ function exportCSVFile(headers, items, fileTitle) {
   }
   // Convert Object to JSON
   var jsonObject = JSON.stringify(items);
-  var csv = this.convertToCSV(jsonObject);
+  var csv = convertToCSV(jsonObject);
   var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
   var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   if (navigator.msSaveBlob) { // IE 10+
@@ -280,22 +279,18 @@ app.listen(80, function () {
 
 // import csv
 // import simplekml
-
 // def dms_to_dd(d, m, s):
 //     try:
 //         return float(d) + float(m) / 60 + float(s) / 3600
 //     except (ValueError, TypeError):
 //         return None
-
 // def dms_to_dd1(d, m, s):
 //     try:
 //         return (float(d) + float(m) / 60 + float(s) / 3600)*-1
 //     except (ValueError, TypeError):
 //         return None
-
 // def create_kml(input_file, output_file):
 //     kml = simplekml.Kml()
-
 //     with open(input_file, "r") as f:
 //         reader = csv.DictReader(f)
 //         for row in reader:
@@ -303,14 +298,11 @@ app.listen(80, function () {
 //             trans_dec_long = dms_to_dd1(row["trans_long_degrees"], row["trans_long_minutes"], row["trans_long_seconds"])
 //             rec_dec_lat = dms_to_dd(row["rec_lat_degrees"], row["rec_lat_minutes"], row["rec_lat_seconds"])
 //             rec_dec_long = dms_to_dd1(row["rec_long_degrees"], row["rec_long_minutes"], row["rec_long_seconds"])
-
 //             if trans_dec_lat and trans_dec_long and rec_dec_lat and rec_dec_long:
 //                 coords = [(trans_dec_long, trans_dec_lat), (rec_dec_long, rec_dec_lat)]
 //                 lin = kml.newlinestring(name=row["unique_system_identifier"], coords=coords)
 //                 lin.style.linestyle.color = "ff0000ff"  # Red
-
 //     kml.save(output_file)
-
 // if __name__ == "__main__":
 //     input_file = "exported_results.csv"
 //     output_file = "output.kml"
