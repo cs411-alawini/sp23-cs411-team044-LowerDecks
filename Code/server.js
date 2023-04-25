@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var mysql = require('mysql2');
+const fs = require('fs')
 var path = require('path');
 var connection = mysql.createConnection({
                 host: '34.134.82.72',
@@ -34,22 +35,8 @@ function exportCSVFile(headers, items, fileTitle) {
   var jsonObject = JSON.stringify(items);
   var csv = convertToCSV(jsonObject);
   var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
-  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  if (navigator.msSaveBlob) { // IE 10+
-      navigator.msSaveBlob(blob, exportedFilenmae);
-  } else {
-      var link = document.createElement("a");
-      if (link.download !== undefined) { // feature detection
-          // Browsers that support HTML5 download attribute
-          var url = URL.createObjectURL(blob);
-          link.setAttribute("href", url);
-          link.setAttribute("download", exportedFilenmae);
-          link.style.visibility = 'hidden';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-      }
-  }
+  fs.writeFileSync(exportedFilenmae,csv)
+  
 }
 var headers = {
   usi: 'unique_system_identifier',
@@ -266,7 +253,7 @@ WHERE
       var fileTitle='exported_results';
       exportCSVFile(headers, itemsformatted, fileTitle);
 
-      // res.send('<html><head><title>New Page</title></head><body><h1>New Page</h1><iframe src="https://www.google.com/maps/d/u/3/embed?mid=1jy4kINNsLBSc-wnzUyWzcB-8sAhMeA4&ehbc=2E312F" width="640" height="480"></iframe></body></html>');
+      res.send('<html><head><title>New Page</title></head><body><h1>New Page</h1><iframe src="https://www.google.com/maps/d/u/3/embed?mid=1jy4kINNsLBSc-wnzUyWzcB-8sAhMeA4&ehbc=2E312F" width="640" height="480"></iframe></body></html>');
       // res.send({'message': "transaction",'result': result});
     })
   
