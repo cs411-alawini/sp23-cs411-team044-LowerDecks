@@ -12,10 +12,12 @@
     "debug": "~2.6.9",
     "ejs": "~2.6.1",
     "express": "~4.16.1",
+    "fs": "^0.0.1-security",
     "http-errors": "~1.6.3",
     "json2csv": "^6.0.0-alpha.2",
     "morgan": "~1.9.1",
     "mysql2": "^3.2.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "togeojson": "^0.16.0"
   }
 }

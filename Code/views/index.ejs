@@ -5,10 +5,119 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-  </head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7EGvkfFKSINpd79_lv8EHrq7W9KtxPB0"></script>
+    <style>
+      #map {
+        width: 100%;
+      }
 
+      body {
+        background: url("https://helios-i.mashable.com/imagery/articles/03bDuXus9Lsnz9sUqURbDiB/hero-image.fill.size_1200x675.v1643714839.jpg") no-repeat center center fixed;
+        background-size: cover;
+      }
+
+      h1 {
+        font-family: 'Impact', sans-serif;
+        font-size: 72px;
+        color: white;
+        text-shadow: 4px 4px 4px #000080;
+      }
+    </style>
+  </head>
   <body>
+    <script>
+      let map;
+      let polylines = [];
+    
+      function initMap() {
+        useOriginalRegex();
+        const emails = document.getElementById("emails").value;
+        map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 6,
+          center: { lat: 40.7584, lng: -82.5154 },
+        });
+        fetch(`/show-paths?emails=${emails}`)
+          .then((response) => response.json())
+          .then((data) => {
+            const geojson = data.geojson;
+            geojson.features.forEach((feature) => {
+     
+              const coordinates = feature.geometry.coordinates;
+              const path = [
+                { lat: coordinates[0][1], lng: coordinates[0][0] },
+                { lat: coordinates[1][1], lng: coordinates[1][0] }
+              ];
+
+              const polyline = new google.maps.Polyline({
+                path: path,
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+              });
+              polyline.setMap(map);
+              polylines.push(polyline);
+            });
+          });
+      }
+      function updatePaths() {
+        polylines.forEach((polyline) => {
+          polyline.setMap(null);
+        });
+        polylines = [];
+        const emails = document.getElementById("emails").value;
+        console.log(emails)
+        fetch(`/show-paths?emails=${emails}`)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            const geojson = data.geojson;
+            geojson.features.forEach((feature) => {
+     
+            const coordinates = feature.geometry.coordinates;
+            const path = [
+              { lat: coordinates[0][1], lng: coordinates[0][0] },
+              { lat: coordinates[1][1], lng: coordinates[1][0] }
+            ];
+
+            const polyline = new google.maps.Polyline({
+              path: path,
+              geodesic: true,
+              strokeColor: '#FF0000',
+              strokeOpacity: 1.0,
+              strokeWeight: 2,
+            });
+            polyline.setMap(map);
+            polylines.push(polyline);
+          });
+        });
+      }
+      function useOriginalRegex() {
+  var regexInput = document.getElementById("emails");
+  regexInput.value = "^([A-Za-z0-9._%+-]+@(zmckay-brothers\\.com|wcwtech\\.com|geodesicnetworks\\.com|auburndata\\.com|abservicesllc\\.com|NeXXComwireless\\.com|isignalnetworks\\.com|anova-tech\\.com|infiniumcm\\.com|tatora\\.com|midwestics\\.com|apsaranetworks\\.com|bsonetwork\\.com|striketechnologies\\.com|akingump\\.com|surveillancetechs\\.com|bobbroadband\\.com|gammafcc@gmail\\.com|newlinenet\\.com))$";
+}
+    
+      document.addEventListener('DOMContentLoaded', initMap);
+    </script>
+ 
     <center><h1>Welcome to HFTracer</h1></center>
+    <div class="container mt-4">
+      <div class="card">
+        <div class="card-body">
+          <h2>Path Visualization</h2>
+          <form onsubmit="updatePaths(); return false;">
+            <div class="form-group">
+              <label for="emails">Email Address(es)</label>
+              <input type="text" class="form-control col-lg-9" id="emails" aria-describedby="emailHelp" placeholder="Enter email addresses separated by commas" name="emails">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Paths</button>
+            <button type="button" class="btn btn-secondary" onclick="useOriginalRegex()">Use Original Regex</button>
+          </form>
+          <div style="margin-bottom: 20px;"></div>
+          <div id="map" style="height: 600px;"></div>
+        </div>
+      </div>
+    </div>
     <div class="container mt-4" name="initial">
       <div class="card">
         <div class="card-body">
