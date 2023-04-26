@@ -22,9 +22,16 @@
         color: white;
         text-shadow: 4px 4px 4px #000080;
       }
+
     </style>
   </head>
   <body>
+    <div id="spinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    
     <script>
       let map;
       let polylines = [];
@@ -36,6 +43,7 @@
           zoom: 6,
           center: { lat: 40.7584, lng: -82.5154 },
         });
+
         fetch(`/show-paths?emails=${emails}`)
           .then((response) => response.json())
           .then((data) => {
@@ -93,21 +101,21 @@
         });
       }
       function useOriginalRegex() {
-  var regexInput = document.getElementById("emails");
-  regexInput.value = "^([A-Za-z0-9._%+-]+@(zmckay-brothers\\.com|wcwtech\\.com|geodesicnetworks\\.com|auburndata\\.com|abservicesllc\\.com|NeXXComwireless\\.com|isignalnetworks\\.com|anova-tech\\.com|infiniumcm\\.com|tatora\\.com|midwestics\\.com|apsaranetworks\\.com|bsonetwork\\.com|striketechnologies\\.com|akingump\\.com|surveillancetechs\\.com|bobbroadband\\.com|gammafcc@gmail\\.com|newlinenet\\.com))$";
-}
+        var regexInput = document.getElementById("emails");
+        regexInput.value = "^([A-Za-z0-9._%+-]+@(zmckay-brothers\\.com|wcwtech\\.com|geodesicnetworks\\.com|auburndata\\.com|abservicesllc\\.com|NeXXComwireless\\.com|isignalnetworks\\.com|anova-tech\\.com|infiniumcm\\.com|tatora\\.com|midwestics\\.com|apsaranetworks\\.com|bsonetwork\\.com|striketechnologies\\.com|akingump\\.com|surveillancetechs\\.com|bobbroadband\\.com|gammafcc@gmail\\.com|newlinenet\\.com))$";
+      }
     
       document.addEventListener('DOMContentLoaded', initMap);
     </script>
  
-    <center><h1>Welcome to HFTracer</h1></center>
+    <center><h1>Welcome to HFTracker</h1></center>
     <div class="container mt-4">
       <div class="card">
         <div class="card-body">
           <h2>Path Visualization</h2>
           <form onsubmit="updatePaths(); return false;">
             <div class="form-group">
-              <label for="emails">Email Address(es)</label>
+              <label for="emails">Email Address(es) of FCC Registered Entities</label>
               <input type="text" class="form-control col-lg-9" id="emails" aria-describedby="emailHelp" placeholder="Enter email addresses separated by commas" name="emails">
             </div>
             <button type="submit" class="btn btn-primary">Update Paths</button>
