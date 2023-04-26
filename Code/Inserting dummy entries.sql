@@ -1,14 +1,19 @@
 
+SELECT * FROM License LIMIT 10;
+
 SELECT * FROM License WHERE unique_system_identifier = 111;
 SELECT * FROM Path WHERE unique_system_identifier = 111;
 SELECT * FROM Coordinate WHERE id = 999999;
+SELECT * FROM Coordinate WHERE id IN (SELECT id FROM Locations WHERE unique_system_identifier = 111);
 SELECT * FROM Locations WHERE unique_system_identifier = 111;
+SELECT id FROM Locations WHERE unique_system_identifier = 111;
+-- SELECT id FROM Locations WHERE unique_system_identifier = 111;
 -- SELECT * FROM Coordinate LIMIT 5;
 
-
+DELETE FROM Coordinate WHERE id = 999999;
+DELETE FROM Locations WHERE unique_system_identifier = 111;
 
 -- Insertion
--- START TRANSACTION;
 
 -- Insert data into License table
 INSERT INTO License (unique_system_identifier, name, email, street_address, city, state)
@@ -22,5 +27,3 @@ VALUES (999999, 37.7749, 122.4194, NULL, 'N', 122.4194, 37.7749, NULL, 'W');
 -- Insert data into Locations table
 INSERT INTO Locations (unique_system_identifier, location_number, location_address, location_city, location_county, location_state, id)
 VALUES (111, 1, '123 Main St', 'Anytown', 'Any County', 'CA', 999999);
-
--- COMMIT;
