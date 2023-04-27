@@ -219,12 +219,13 @@ app.post('/advancedQuery1', function(req, res) {
 });
 
 app.post('/advancedQuery2', function(req, res) {
+  var namelike = req.body.namelike;
   var sql = `SELECT loc.location_city, COUNT(*) as Cnt
   FROM License li JOIN Locations loc USING (unique_system_identifier)
-  WHERE li.name LIKE '%INC.%'
+  WHERE li.name LIKE '%${namelike}%'
   GROUP BY loc.location_city
   ORDER BY Cnt DESC
-  LIMIT 15;`
+  LIMIT 30;`
   console.log(sql);
   connection.query(sql, function(err, result) {
     if (err) {
