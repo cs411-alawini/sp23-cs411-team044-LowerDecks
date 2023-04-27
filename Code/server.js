@@ -102,12 +102,15 @@ app.post('/deleteCascade', function(req, res) {
   var usi = req.body.deleteusicascade;
   var sql = `SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
   START TRANSACTION;
-  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t1,t2,t3;
   CREATE TABLE t1 (
+    SELECT DISTINCT id FROM Locations WHERE unique_system_identifier = ${usi});
+  CREATE TABLE t2 (
     SELECT DISTINCT id FROM Locations loc
-  WHERE id NOT IN ( SELECT DISTINCT id FROM Locations WHERE unique_system_identifier != ${usi} )
-    AND loc.unique_system_identifier = ${usi});
-
+    WHERE id IN ( SELECT id FROM t1 ) AND loc.unique_system_identifier != ${usi});
+  CREATE TABLE t3 (
+    SELECT id FROM t1
+      WHERE id NOT IN	(SELECT id FROM t2)  );
   DELETE FROM License WHERE unique_system_identifier = ${usi};
   COMMIT;
   SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;`
