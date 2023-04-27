@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var mysql = require('mysql2');
+const fs = require('fs')
 var path = require('path');
 var connection = mysql.createConnection({
                 host: '34.134.82.72',
@@ -11,6 +12,47 @@ var connection = mysql.createConnection({
 
 connection.connect;
 
+function convertToCSV(objArray) {
+  var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+  var str = '';
+  for (var i = 0; i < array.length; i++) {
+      var line = '';
+      for (var index in array[i]) {
+          if (line != '') line += ','
+
+          line += array[i][index];
+      }
+
+      str += line + '\r\n';
+  }
+  return str;
+}
+function exportCSVFile(headers, items, fileTitle) {
+  if (headers) {
+      items.unshift(headers);
+  }
+  // Convert Object to JSON
+  var jsonObject = JSON.stringify(items);
+  var csv = convertToCSV(jsonObject);
+  var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
+  fs.writeFileSync(exportedFilenmae,csv)
+  
+}
+var headers = {
+  usi: 'unique_system_identifier',
+  tlad: 'trans_lat_degrees',
+  tlam: 'trans_lat_minutes',
+  tlas: 'trans_lat_seconds',
+  tlod: 'trans_long_degrees',
+  tlom: 'trans_long_minutes',
+  tlos: 'trans_long_seconds',
+  rlad: 'rec_lat_degrees',
+  rlam: 'rec_lat_minutes',
+  rlas: 'rec_lat_seconds',
+  rlod: 'rec_long_degrees',
+  rlom: 'rec_long_minutes',
+  rlos: 'rec_long_seconds'
+};
 
 var app = express();
 
@@ -24,7 +66,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname + '../public'));
 
 
-const fs = require('fs');
+// const fs = require('fs');
 const { DOMParser } = require('xmldom');
 const toGeoJSON = require('togeojson');
 
@@ -108,6 +150,67 @@ WHERE
 /* GET home page, respond by rendering index.ejs */
 app.get('/', function(req, res) {
   res.render('index', {title: 'HFTracer'});
+});
+
+app.post('/deleteCascade', function(req, res) {
+  var usi = req.body.deleteusicascade;
+  
+  var sql = `DELIMITER //
+
+  START TRANSACTION;
+  -- SET @USI = ${usi};
+  DROP TABLE IF EXISTS t1, t2, t3;
+  CREATE TABLE t1 (
+    SELECT DISTINCT id FROM Locations WHERE unique_system_identifier = ${usi});
+  CREATE TABLE t2 (
+    SELECT DISTINCT id FROM Locations loc
+    WHERE id IN ( SELECT id FROM t1 ) AND loc.unique_system_identifier != ${usi});
+  CREATE TABLE t3 (
+    SELECT id FROM t1
+      WHERE id NOT IN	(SELECT id FROM t2)  );
+  -- DELETE FROM t1 WHERE id IN ( SELECT id FROM t2 ) AND id <> -100;
+  
+  DROP TRIGGER IF EXISTS DeletePathsAndLocations;
+  CREATE TRIGGER DeletePathsAndLocations
+  BEFORE DELETE
+  ON License
+  FOR EACH ROW
+  BEGIN
+    DECLARE done BOOLEAN DEFAULT FALSE;
+    DECLARE curr_id INT;
+    DECLARE ids CURSOR FOR
+      SELECT id FROM t3;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    
+    DELETE FROM Path WHERE unique_system_identifier = ${usi};
+    DELETE FROM Locations WHERE unique_system_identifier = ${usi};
+  
+    OPEN ids;
+  
+    REPEAT
+      DELETE FROM Coordinate WHERE id = curr_id;
+      FETCH NEXT FROM ids INTO curr_id;
+    UNTIL done
+    END REPEAT;
+  
+    CLOSE ids;
+  
+  END;
+  
+  DELETE FROM License WHERE unique_system_identifier = ${usi};
+  COMMIT;
+  
+  //
+  
+  DELIMITER ;`
+  console.log(sql);
+  connection.query(sql, function(err, result) {
+    if (err) {
+      res.send(err)
+      return;
+    };
+    res.send({'message': "Deleted Record from License, Path, Locations with usi "+usi + ", and also record from Coordinate that has no connection to any Record from Locations", 'result':result});
+  })
 });
 
 app.post('/insert', function(req, res) {
@@ -229,7 +332,7 @@ app.post('/advancedQuery2', function(req, res) {
 
 });
 
-app.post('/transaction', function(req, res) {
+app.post('/ECFeature', function(req, res) {
     
     var sql = `SELECT
     L.unique_system_identifier,
@@ -272,6 +375,28 @@ WHERE
         return;
       }
       console.log(result);
+      
+      var itemsformatted=[]
+      result.forEach((item) =>{
+        itemsformatted.push({
+          usi: item.unique_system_identifier,
+          tlad: item.trans_lat_degrees,
+          tlam: item.trans_lat_minutes,
+          tlas: item.trans_lat_seconds,
+          tlod: item.trans_long_degrees,
+          tlom: item.trans_long_minutes,
+          tlos: item.trans_long_seconds,
+          rlad: item.rec_lat_degrees,
+          rlam: item.rec_lat_minutes,
+          rlas: item.rec_lat_seconds,
+          rlod: item.rec_long_degrees,
+          rlom: item.rec_long_minutes,
+          rlos: item.rec_long_seconds
+        });
+      });
+      var fileTitle='exported_results';
+      exportCSVFile(headers, itemsformatted, fileTitle);
+
       res.send('<html><head><title>New Page</title></head><body><h1>New Page</h1><iframe src="https://www.google.com/maps/d/u/3/embed?mid=1jy4kINNsLBSc-wnzUyWzcB-8sAhMeA4&ehbc=2E312F" width="640" height="480"></iframe></body></html>');
       // res.send({'message': "transaction",'result': result});
     })
@@ -282,24 +407,21 @@ app.listen(80, function () {
     console.log('Node app is running on port 80');
 });
 
+
 // import csv
 // import simplekml
-
 // def dms_to_dd(d, m, s):
 //     try:
 //         return float(d) + float(m) / 60 + float(s) / 3600
 //     except (ValueError, TypeError):
 //         return None
-
 // def dms_to_dd1(d, m, s):
 //     try:
 //         return (float(d) + float(m) / 60 + float(s) / 3600)*-1
 //     except (ValueError, TypeError):
 //         return None
-
 // def create_kml(input_file, output_file):
 //     kml = simplekml.Kml()
-
 //     with open(input_file, "r") as f:
 //         reader = csv.DictReader(f)
 //         for row in reader:
@@ -307,14 +429,11 @@ app.listen(80, function () {
 //             trans_dec_long = dms_to_dd1(row["trans_long_degrees"], row["trans_long_minutes"], row["trans_long_seconds"])
 //             rec_dec_lat = dms_to_dd(row["rec_lat_degrees"], row["rec_lat_minutes"], row["rec_lat_seconds"])
 //             rec_dec_long = dms_to_dd1(row["rec_long_degrees"], row["rec_long_minutes"], row["rec_long_seconds"])
-
 //             if trans_dec_lat and trans_dec_long and rec_dec_lat and rec_dec_long:
 //                 coords = [(trans_dec_long, trans_dec_lat), (rec_dec_long, rec_dec_lat)]
 //                 lin = kml.newlinestring(name=row["unique_system_identifier"], coords=coords)
 //                 lin.style.linestyle.color = "ff0000ff"  # Red
-
 //     kml.save(output_file)
-
 // if __name__ == "__main__":
 //     input_file = "exported_results.csv"
 //     output_file = "output.kml"
