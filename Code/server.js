@@ -7,66 +7,20 @@ var connection = mysql.createConnection({
                 host: '34.134.82.72',
                 user: 'root',
                 password: 'LowerDecksFTW',
-                database: 'primaryset'
+                database: 'primaryset',
+                multipleStatements: true
 });
 
 connection.connect;
 
-function convertToCSV(objArray) {
-  var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
-  var str = '';
-  for (var i = 0; i < array.length; i++) {
-      var line = '';
-      for (var index in array[i]) {
-          if (line != '') line += ','
-
-          line += array[i][index];
-      }
-
-      str += line + '\r\n';
-  }
-  return str;
-}
-function exportCSVFile(headers, items, fileTitle) {
-  if (headers) {
-      items.unshift(headers);
-  }
-  // Convert Object to JSON
-  var jsonObject = JSON.stringify(items);
-  var csv = convertToCSV(jsonObject);
-  var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
-  fs.writeFileSync(exportedFilenmae,csv)
-  
-}
-var headers = {
-  usi: 'unique_system_identifier',
-  tlad: 'trans_lat_degrees',
-  tlam: 'trans_lat_minutes',
-  tlas: 'trans_lat_seconds',
-  tlod: 'trans_long_degrees',
-  tlom: 'trans_long_minutes',
-  tlos: 'trans_long_seconds',
-  rlad: 'rec_lat_degrees',
-  rlam: 'rec_lat_minutes',
-  rlas: 'rec_lat_seconds',
-  rlod: 'rec_long_degrees',
-  rlom: 'rec_long_minutes',
-  rlos: 'rec_long_seconds'
-};
-
 var app = express();
-
-
 // set up ejs view engine 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
- 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname + '../public'));
 
-
-// const fs = require('fs');
 const { DOMParser } = require('xmldom');
 const toGeoJSON = require('togeojson');
 
@@ -110,13 +64,12 @@ JOIN
     ON L2.id = C2.id
 WHERE
     P.path_type_desc = 'Fixed Point-to-Point'
-    AND L.email REGEXP ?`; // use parameterized query
+    AND L.email REGEXP ?`;
   connection.query(sql, [emailRegex], function (err, result){
     if (err) {
       res.send(err);
       return;
     }
-
     let kmlString = '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document>';
 
     result.forEach((row) => {
@@ -124,7 +77,6 @@ WHERE
       const transDecLong = -dmsToDD(row.trans_long_degrees, row.trans_long_minutes, row.trans_long_seconds);
       const recDecLat = dmsToDD(row.rec_lat_degrees, row.rec_lat_minutes, row.rec_lat_seconds);
       const recDecLong = -dmsToDD(row.rec_long_degrees, row.rec_long_minutes, row.rec_long_seconds);
-
       kmlString += `<Placemark>
         <name>${row.unique_system_identifier}</name>
         <styleUrl>#line-1</styleUrl>
@@ -133,32 +85,23 @@ WHERE
         </LineString>
       </Placemark>`;
     });
-
     kmlString += '</Document></kml>';
-
-    // Convert KML to GeoJSON
     const parser = new DOMParser();
     const kml = parser.parseFromString(kmlString, 'text/xml');
     const geojson = toGeoJSON.kml(kml);
-
-    // Send the GeoJSON object to the frontend
     res.send({ geojson });
   });
 });
 
 
-/* GET home page, respond by rendering index.ejs */
 app.get('/', function(req, res) {
   res.render('index', {title: 'HFTracer'});
 });
 
 app.post('/deleteCascade', function(req, res) {
   var usi = req.body.deleteusicascade;
-  
-  var sql = `DELIMITER //
-
+  var sql = `SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
   START TRANSACTION;
-  -- SET @USI = ${usi};
   DROP TABLE IF EXISTS t1, t2, t3;
   CREATE TABLE t1 (
     SELECT DISTINCT id FROM Locations WHERE unique_system_identifier = ${usi});
@@ -168,41 +111,9 @@ app.post('/deleteCascade', function(req, res) {
   CREATE TABLE t3 (
     SELECT id FROM t1
       WHERE id NOT IN	(SELECT id FROM t2)  );
-  -- DELETE FROM t1 WHERE id IN ( SELECT id FROM t2 ) AND id <> -100;
-  
-  DROP TRIGGER IF EXISTS DeletePathsAndLocations;
-  CREATE TRIGGER DeletePathsAndLocations
-  BEFORE DELETE
-  ON License
-  FOR EACH ROW
-  BEGIN
-    DECLARE done BOOLEAN DEFAULT FALSE;
-    DECLARE curr_id INT;
-    DECLARE ids CURSOR FOR
-      SELECT id FROM t3;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-    
-    DELETE FROM Path WHERE unique_system_identifier = ${usi};
-    DELETE FROM Locations WHERE unique_system_identifier = ${usi};
-  
-    OPEN ids;
-  
-    REPEAT
-      DELETE FROM Coordinate WHERE id = curr_id;
-      FETCH NEXT FROM ids INTO curr_id;
-    UNTIL done
-    END REPEAT;
-  
-    CLOSE ids;
-  
-  END;
-  
   DELETE FROM License WHERE unique_system_identifier = ${usi};
   COMMIT;
-  
-  //
-  
-  DELIMITER ;`
+  SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;`
   console.log(sql);
   connection.query(sql, function(err, result) {
     if (err) {
@@ -210,6 +121,7 @@ app.post('/deleteCascade', function(req, res) {
       return;
     };
     res.send({'message': "Deleted Record from License, Path, Locations with usi "+usi + ", and also record from Coordinate that has no connection to any Record from Locations", 'result':result});
+    console.log(result);
   })
 });
 
@@ -220,9 +132,7 @@ app.post('/insert', function(req, res) {
   var street = req.body.insertstreet;
   var city = req.body.insertcity;
   var state = req.body.insertstate;
-  //INSERT INTO License (unique_system_identifier,name,email,street_address,city,state) VALUES ('954597','NBC TELEMUNDO LICENSE LLC','angela.ball@nbcuni.com','300 New Jersey Ave. SUITE 7','WASHINGTON','DC');
   var sql = `INSERT INTO License (unique_system_identifier,name,email,street_address,city,state) VALUES (${usi},'${name}','${email}','${street}','${city}','${state}')`;
-
   console.log(sql);
   connection.query(sql, function(err, result) {
     if (err) {
@@ -236,7 +146,6 @@ app.post('/insert', function(req, res) {
 app.post('/search', function(req, res) {
   var usi = req.body.searchusi;
   var name = req.body.searchname;
-  
   var sql = `SELECT li.unique_system_identifier, li.name, li.email, li.street_address, li.city, li.state
   FROM License li
   WHERE li.unique_system_identifier = ${usi} AND li.name = '${name}';`
@@ -258,11 +167,9 @@ app.post('/update', function(req, res) {
   var street = req.body.updatestreet;
   var city = req.body.updatecity;
   var state = req.body.updatestate;
-  //INSERT INTO Licensee (unique_system_identifier,name,email,street_address,city,state) VALUES ('954597','NBC TELEMUNDO LICENSE LLC','angela.ball@nbcuni.com','300 New Jersey Ave. SUITE 7','WASHINGTON','DC');
   var sql = `UPDATE License
   SET email= '${email}', street_address= '${street}', city= '${city}', state= '${state}'
   WHERE unique_system_identifier = ${usi} and name = '${name}';`;
-
   console.log(sql);
   connection.query(sql, function(err, result) {
     if (err) {
@@ -277,7 +184,6 @@ app.post('/update', function(req, res) {
 app.post('/delete', function(req, res) {
   var usi = req.body.deleteusi;
   var name = req.body.deletename;
-  
   var sql = `DELETE FROM License li
   WHERE li.unique_system_identifier = ${usi} AND li.name = '${name}';`
   console.log(sql);
@@ -313,7 +219,6 @@ app.post('/advancedQuery1', function(req, res) {
 });
 
 app.post('/advancedQuery2', function(req, res) {
-  
   var sql = `SELECT loc.location_city, COUNT(*) as Cnt
   FROM License li JOIN Locations loc USING (unique_system_identifier)
   WHERE li.name LIKE '%INC.%'
@@ -329,112 +234,8 @@ app.post('/advancedQuery2', function(req, res) {
     console.log(result);
     res.send({'message': "Advanced Query 2",'result': result});
   })
-
 });
-
-app.post('/ECFeature', function(req, res) {
-    
-    var sql = `SELECT
-    L.unique_system_identifier,
-    C1.lat_degrees AS trans_lat_degrees,
-    C1.lat_minutes AS trans_lat_minutes,
-    C1.lat_seconds AS trans_lat_seconds,
-    C1.long_degrees AS trans_long_degrees,
-    C1.long_minutes AS trans_long_minutes,
-    C1.long_seconds AS trans_long_seconds,
-    C2.lat_degrees AS rec_lat_degrees,
-    C2.lat_minutes AS rec_lat_minutes,
-    C2.lat_seconds AS rec_lat_seconds,
-    C2.long_degrees AS rec_long_degrees,
-    C2.long_minutes AS rec_long_minutes,
-    C2.long_seconds AS rec_long_seconds
-FROM
-    License L
-JOIN
-    Path P
-    ON L.unique_system_identifier = P.unique_system_identifier
-JOIN
-    Locations L1
-    ON P.transmit_location_number = L1.location_number AND L1.unique_system_identifier = P.unique_system_identifier
-JOIN
-    Locations L2
-    ON P.receiver_location_number = L2.location_number AND L2.unique_system_identifier = P.unique_system_identifier
-JOIN
-    Coordinate C1
-    ON L1.id = C1.id
-JOIN
-    Coordinate C2
-    ON L2.id = C2.id
-WHERE
-    P.path_type_desc = 'Fixed Point-to-Point'
-    and L.email = 'djones@hbi.com';`
-    console.log(sql);
-    connection.query(sql, function(err, result) {
-      if (err) {
-        res.send(err)
-        return;
-      }
-      console.log(result);
-      
-      var itemsformatted=[]
-      result.forEach((item) =>{
-        itemsformatted.push({
-          usi: item.unique_system_identifier,
-          tlad: item.trans_lat_degrees,
-          tlam: item.trans_lat_minutes,
-          tlas: item.trans_lat_seconds,
-          tlod: item.trans_long_degrees,
-          tlom: item.trans_long_minutes,
-          tlos: item.trans_long_seconds,
-          rlad: item.rec_lat_degrees,
-          rlam: item.rec_lat_minutes,
-          rlas: item.rec_lat_seconds,
-          rlod: item.rec_long_degrees,
-          rlom: item.rec_long_minutes,
-          rlos: item.rec_long_seconds
-        });
-      });
-      var fileTitle='exported_results';
-      exportCSVFile(headers, itemsformatted, fileTitle);
-
-      res.send('<html><head><title>New Page</title></head><body><h1>New Page</h1><iframe src="https://www.google.com/maps/d/u/3/embed?mid=1jy4kINNsLBSc-wnzUyWzcB-8sAhMeA4&ehbc=2E312F" width="640" height="480"></iframe></body></html>');
-      // res.send({'message': "transaction",'result': result});
-    })
-  
-  });
 
 app.listen(80, function () {
     console.log('Node app is running on port 80');
 });
-
-
-// import csv
-// import simplekml
-// def dms_to_dd(d, m, s):
-//     try:
-//         return float(d) + float(m) / 60 + float(s) / 3600
-//     except (ValueError, TypeError):
-//         return None
-// def dms_to_dd1(d, m, s):
-//     try:
-//         return (float(d) + float(m) / 60 + float(s) / 3600)*-1
-//     except (ValueError, TypeError):
-//         return None
-// def create_kml(input_file, output_file):
-//     kml = simplekml.Kml()
-//     with open(input_file, "r") as f:
-//         reader = csv.DictReader(f)
-//         for row in reader:
-//             trans_dec_lat = dms_to_dd(row["trans_lat_degrees"], row["trans_lat_minutes"], row["trans_lat_seconds"])
-//             trans_dec_long = dms_to_dd1(row["trans_long_degrees"], row["trans_long_minutes"], row["trans_long_seconds"])
-//             rec_dec_lat = dms_to_dd(row["rec_lat_degrees"], row["rec_lat_minutes"], row["rec_lat_seconds"])
-//             rec_dec_long = dms_to_dd1(row["rec_long_degrees"], row["rec_long_minutes"], row["rec_long_seconds"])
-//             if trans_dec_lat and trans_dec_long and rec_dec_lat and rec_dec_long:
-//                 coords = [(trans_dec_long, trans_dec_lat), (rec_dec_long, rec_dec_lat)]
-//                 lin = kml.newlinestring(name=row["unique_system_identifier"], coords=coords)
-//                 lin.style.linestyle.color = "ff0000ff"  # Red
-//     kml.save(output_file)
-// if __name__ == "__main__":
-//     input_file = "exported_results.csv"
-//     output_file = "output.kml"
-//     create_kml(input_file, output_file)
