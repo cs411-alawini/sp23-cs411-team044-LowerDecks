@@ -12,7 +12,7 @@
       }
 
       body {
-        background: url("https://helios-i.mashable.com/imagery/articles/03bDuXus9Lsnz9sUqURbDiB/hero-image.fill.size_1200x675.v1643714839.jpg") no-repeat center center fixed;
+        background: url("https://www.rantecantennas.com/wp-content/uploads/2020/01/microwave-communication-1024x461.jpeg") no-repeat center center fixed;
         background-size: cover;
       }
 
@@ -20,11 +20,11 @@
         font-family: 'Impact', sans-serif;
         font-size: 72px;
         color: white;
-        text-shadow: 4px 4px 4px #000080;
+        text-shadow: 2px 2px 2px #a5430b;
       }
+
     </style>
   </head>
-  <body>
     <script>
       let map;
       let polylines = [];
@@ -36,6 +36,7 @@
           zoom: 6,
           center: { lat: 40.7584, lng: -82.5154 },
         });
+
         fetch(`/show-paths?emails=${emails}`)
           .then((response) => response.json())
           .then((data) => {
@@ -47,7 +48,6 @@
                 { lat: coordinates[0][1], lng: coordinates[0][0] },
                 { lat: coordinates[1][1], lng: coordinates[1][0] }
               ];
-
               const polyline = new google.maps.Polyline({
                 path: path,
                 geodesic: true,
@@ -93,21 +93,21 @@
         });
       }
       function useOriginalRegex() {
-  var regexInput = document.getElementById("emails");
-  regexInput.value = "^([A-Za-z0-9._%+-]+@(zmckay-brothers\\.com|wcwtech\\.com|geodesicnetworks\\.com|auburndata\\.com|abservicesllc\\.com|NeXXComwireless\\.com|isignalnetworks\\.com|anova-tech\\.com|infiniumcm\\.com|tatora\\.com|midwestics\\.com|apsaranetworks\\.com|bsonetwork\\.com|striketechnologies\\.com|akingump\\.com|surveillancetechs\\.com|bobbroadband\\.com|gammafcc@gmail\\.com|newlinenet\\.com))$";
-}
+        var regexInput = document.getElementById("emails");
+        regexInput.value = "^([A-Za-z0-9._%+-]+@(zmckay-brothers\\.com|wcwtech\\.com|geodesicnetworks\\.com|auburndata\\.com|abservicesllc\\.com|NeXXComwireless\\.com|isignalnetworks\\.com|anova-tech\\.com|infiniumcm\\.com|tatora\\.com|midwestics\\.com|apsaranetworks\\.com|bsonetwork\\.com|striketechnologies\\.com|akingump\\.com|surveillancetechs\\.com|bobbroadband\\.com|gammafcc@gmail\\.com|newlinenet\\.com))$";
+      }
     
       document.addEventListener('DOMContentLoaded', initMap);
     </script>
- 
-    <center><h1>Welcome to HFTracer</h1></center>
+
+    <center><h1>Welcome to HFTracker</h1></center>
     <div class="container mt-4">
       <div class="card">
         <div class="card-body">
           <h2>Path Visualization</h2>
           <form onsubmit="updatePaths(); return false;">
             <div class="form-group">
-              <label for="emails">Email Address(es)</label>
+              <label for="emails">Email Address(es) of FCC Registered Entities</label>
               <input type="text" class="form-control col-lg-9" id="emails" aria-describedby="emailHelp" placeholder="Enter email addresses separated by commas" name="emails">
             </div>
             <button type="submit" class="btn btn-primary">Update Paths</button>
