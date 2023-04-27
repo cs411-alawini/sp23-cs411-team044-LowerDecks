@@ -12,7 +12,8 @@ SELECT id FROM t1;
 -- SELECT * FROM Coordinate LIMIT 5;
 
 DELETE FROM Coordinate WHERE id = 999999;
-DELETE FROM Locations WHERE unique_system_identifier = 111;
+DELETE FROM License WHERE unique_system_identifier = 222;
+DELETE FROM Locations WHERE unique_system_identifier = 222;
 
 -- Insertion
 

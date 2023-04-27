@@ -1,8 +1,3 @@
--- DROP TRIGGER DeletePathsAndLocations;
-SELECT id FROM Locations WHERE unique_system_identifier = 111;
-DROP TABLE t1;
-DROP TABLE t2;
-
 DELIMITER //
 
 START TRANSACTION;
