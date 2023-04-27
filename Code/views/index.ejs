@@ -12,26 +12,19 @@
       }
 
       body {
-        background: url("https://helios-i.mashable.com/imagery/articles/03bDuXus9Lsnz9sUqURbDiB/hero-image.fill.size_1200x675.v1643714839.jpg") no-repeat center center fixed;
+        background: url("https://www.rantecantennas.com/wp-content/uploads/2020/01/microwave-communication-1024x461.jpeg") no-repeat center center fixed;
         background-size: cover;
       }
 
       h1 {
-        font-family: 'Impact', sans-serif;
+        font-family: 'Ubuntu', sans-serif;
         font-size: 72px;
         color: white;
-        text-shadow: 4px 4px 4px #000080;
+        text-shadow: 4px 4px 4px #a5430b;
       }
 
     </style>
   </head>
-  <body>
-    <div id="spinner">
-      <div class="spinner-border text-primary" role="status">
-        <span class="sr-only">Loading...</span>
-      </div>
-    </div>
-    
     <script>
       let map;
       let polylines = [];
@@ -55,7 +48,6 @@
                 { lat: coordinates[0][1], lng: coordinates[0][0] },
                 { lat: coordinates[1][1], lng: coordinates[1][0] }
               ];
-
               const polyline = new google.maps.Polyline({
                 path: path,
                 geodesic: true,
@@ -107,7 +99,7 @@
     
       document.addEventListener('DOMContentLoaded', initMap);
     </script>
- 
+
     <center><h1>Welcome to HFTracker</h1></center>
     <div class="container mt-4">
       <div class="card">
