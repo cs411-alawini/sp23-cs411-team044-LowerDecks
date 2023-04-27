@@ -1,3 +1,4 @@
+USE `primaryset`;
 
 SELECT * FROM License LIMIT 10;
 

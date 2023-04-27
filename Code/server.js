@@ -66,7 +66,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname + '../public'));
 
 
-const fs = require('fs');
+// const fs = require('fs');
 const { DOMParser } = require('xmldom');
 const toGeoJSON = require('togeojson');
 
@@ -150,6 +150,67 @@ WHERE
 /* GET home page, respond by rendering index.ejs */
 app.get('/', function(req, res) {
   res.render('index', {title: 'HFTracer'});
+});
+
+app.post('/deleteCascade', function(req, res) {
+  var usi = req.body.deleteusicascade;
+  
+  var sql = `DELIMITER //
+
+  START TRANSACTION;
+  -- SET @USI = ${usi};
+  DROP TABLE IF EXISTS t1, t2, t3;
+  CREATE TABLE t1 (
+    SELECT DISTINCT id FROM Locations WHERE unique_system_identifier = ${usi});
+  CREATE TABLE t2 (
+    SELECT DISTINCT id FROM Locations loc
+    WHERE id IN ( SELECT id FROM t1 ) AND loc.unique_system_identifier != ${usi});
+  CREATE TABLE t3 (
+    SELECT id FROM t1
+      WHERE id NOT IN	(SELECT id FROM t2)  );
+  -- DELETE FROM t1 WHERE id IN ( SELECT id FROM t2 ) AND id <> -100;
+  
+  DROP TRIGGER IF EXISTS DeletePathsAndLocations;
+  CREATE TRIGGER DeletePathsAndLocations
+  BEFORE DELETE
+  ON License
+  FOR EACH ROW
+  BEGIN
+    DECLARE done BOOLEAN DEFAULT FALSE;
+    DECLARE curr_id INT;
+    DECLARE ids CURSOR FOR
+      SELECT id FROM t3;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    
+    DELETE FROM Path WHERE unique_system_identifier = ${usi};
+    DELETE FROM Locations WHERE unique_system_identifier = ${usi};
+  
+    OPEN ids;
+  
+    REPEAT
+      DELETE FROM Coordinate WHERE id = curr_id;
+      FETCH NEXT FROM ids INTO curr_id;
+    UNTIL done
+    END REPEAT;
+  
+    CLOSE ids;
+  
+  END;
+  
+  DELETE FROM License WHERE unique_system_identifier = ${usi};
+  COMMIT;
+  
+  //
+  
+  DELIMITER ;`
+  console.log(sql);
+  connection.query(sql, function(err, result) {
+    if (err) {
+      res.send(err)
+      return;
+    };
+    res.send({'message': "Deleted Record from License, Path, Locations with usi "+usi + ", and also record from Coordinate that has no connection to any Record from Locations", 'result':result});
+  })
 });
 
 app.post('/insert', function(req, res) {

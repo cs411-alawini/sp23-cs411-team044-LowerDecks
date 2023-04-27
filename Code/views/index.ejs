@@ -119,6 +119,22 @@
       </div>
     </div>
     <div class="container mt-4" name="initial">
+      
+      <div class="card">
+        <div class="card-body">
+          <h2>Delete Record from License, Path, Locations with usi, and also delete Record from Coordinate that has no connection to any Record from Locations</h2>
+          <form action="deleteCascade" method="POST">
+            <div class="form-group">
+              <label for="usi">Unique_System_Identifier</label>
+              <input type="text" class="form-control col-lg-9" id="deleteusicascade" aria-describedby="emailHelp" placeholder="Enter Unique_System_Identifier" name="deleteusicascade">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+      
+      <br>
+      
       <div class="card">
         <div class="card-body">
           <h2>Insert into License</h2>
