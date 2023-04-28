@@ -120,14 +120,8 @@ app.post('/deleteCascade', function(req, res) {
   ) sub
   ORDER BY path_count DESC
   LIMIT 3;
-  DROP TABLE IF EXISTS t1;
-  CREATE TABLE t1 (
-    SELECT DISTINCT id FROM Locations loc
-    WHERE id NOT IN ( SELECT DISTINCT id FROM Locations WHERE unique_system_identifier != ${usi} )
-    AND loc.unique_system_identifier = ${usi});
 
   DELETE FROM License WHERE unique_system_identifier = ${usi};
-  DROP TABLE IF EXISTS t1;
   COMMIT;
   SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;`
   console.log(sql);

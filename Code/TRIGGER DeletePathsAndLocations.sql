@@ -1,39 +1,7 @@
 DROP TRIGGER IF EXISTS DeletePathsAndLocations;
+DROP TRIGGER IF EXISTS delete_license_and_related_items;
 DROP TABLE IF EXISTS t1, t2, t3, t4;
 SET @USI = 111;
-DELIMITER //
-
-CREATE TRIGGER DeletePathsAndLocations
-BEFORE DELETE
-ON License
-FOR EACH ROW
-BEGIN
-  DECLARE done BOOLEAN DEFAULT FALSE;
-  DECLARE curr_id INT;
-  DECLARE ids CURSOR FOR
-    SELECT id FROM t1;
-  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-  
-  DELETE FROM Path WHERE unique_system_identifier = OLD.unique_system_identifier;
-  DELETE FROM Locations WHERE unique_system_identifier = OLD.unique_system_identifier;
-
-  OPEN ids;
-
-  REPEAT
-    FETCH NEXT FROM ids INTO curr_id;
-    DELETE FROM Coordinate WHERE id = curr_id;
-  UNTIL done
-  END REPEAT;
-
-  CLOSE ids;
-
-END;
-//
-
-DELIMITER ;
-
-
-/*
 
 DELIMITER $$
 
@@ -89,6 +57,40 @@ BEGIN
    
     DROP TEMPORARY TABLE temp_coordinate_ids;
 END $$
+
+DELIMITER ;
+
+
+
+/*
+DELIMITER //
+
+CREATE TRIGGER DeletePathsAndLocations
+BEFORE DELETE
+ON License
+FOR EACH ROW
+BEGIN
+  DECLARE done BOOLEAN DEFAULT FALSE;
+  DECLARE curr_id INT;
+  DECLARE ids CURSOR FOR
+    SELECT id FROM t1;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  
+  DELETE FROM Path WHERE unique_system_identifier = OLD.unique_system_identifier;
+  DELETE FROM Locations WHERE unique_system_identifier = OLD.unique_system_identifier;
+
+  OPEN ids;
+
+  REPEAT
+    FETCH NEXT FROM ids INTO curr_id;
+    DELETE FROM Coordinate WHERE id = curr_id;
+  UNTIL done
+  END REPEAT;
+
+  CLOSE ids;
+
+END;
+//
 
 DELIMITER ;
 
