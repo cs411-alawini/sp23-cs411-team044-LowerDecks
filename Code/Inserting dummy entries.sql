@@ -11,6 +11,7 @@ SELECT id FROM Locations WHERE unique_system_identifier = 111;
 SELECT id FROM t1;
 -- SELECT id FROM Locations WHERE unique_system_identifier = 111;
 -- SELECT * FROM Coordinate LIMIT 5;
+SELECT * FROM License WHERE unique_system_identifier = 222;
 
 DELETE FROM Coordinate WHERE id = 999999;
 DELETE FROM License WHERE unique_system_identifier = 222;
@@ -18,7 +19,7 @@ DELETE FROM Locations WHERE unique_system_identifier = 222;
 
 -- Insertion
 
--- Insert data into License table
+-- Insert data into License tableLocations_ibfk_1
 INSERT INTO License (unique_system_identifier, name, email, street_address, city, state)
 VALUES (111, 'John Doe', 'johndoe@example.com', '123 Main St', 'Anytown', 'CA');
 -- Insert data into Path table
